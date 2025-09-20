@@ -5,7 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class Platformer extends JPanel implements ActionListener, KeyListener {
+public class Oldfile extends JPanel implements ActionListener, KeyListener {
     private Timer timer;
     private int playerX, playerY;
     private int playerWidth, playerHeight;
