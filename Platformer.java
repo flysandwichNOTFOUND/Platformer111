@@ -67,7 +67,7 @@ public class Platformer extends JPanel implements ActionListener, KeyListener {
         repaint();
     }
 
-    private void update() {
+    private void update() { // i moved the detection part in Player.java, this is just intergrating it
         player.x += player.veloX;
         player.y += player.veloY;
 
