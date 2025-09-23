@@ -1,13 +1,17 @@
-public class Main {
-  public static void main(String[] args) {
-    Platformer p = new Platformer();
-    p.main();
-    Platform1 = new Platform(50, 50, 100, 25);
-    Platform2 = new Platform(200, 100, 100, 25);
-    Platform3 = new Platform(350, 150, 100, 25);
-    Platform4 = new Platform(500, 175, 100, 25);
-    Platform5 = new Platform(550, 75, 25, 25);
+import javax.swing.*;        
+import java.awt.*;           
+import java.awt.event.*;  
 
-    Spikes1 = new Spikes(50, 25, 525, 25);
-  }
+public class Main {
+    public static void main(String[] args) {
+    JFrame frame = new JFrame("Simple Platformer");
+      
+    Platformer game = new Platformer();
+    frame.add(game);
+    frame.setSize(800, 600);
+      
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setLocationRelativeTo(null); 
+    frame.setVisible(true);
+}
 }
