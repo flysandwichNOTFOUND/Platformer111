@@ -11,17 +11,17 @@ class Player {
         this.s = s;
     }
 
-  boolean touchingPlatform(Platform p){
+    boolean touchingPlatform(Platform p){
         int playerLeft = x;
         int playerRight = x+s;
         int playerTop = y;
         int playerBottom = y+s;
-    
+
         int platformLeft = p.x;
         int platformRight = p.x+p.l;
         int platformTop = p.y;
         int platformBottom = p.y+p.w;
-    
+
         boolean xOverlap = (playerLeft < platformRight) && (playerRight > platformLeft);
         boolean yOverlap = (playerTop < platformBottom) && (playerBottom > platformTop);
         /*
@@ -29,21 +29,21 @@ class Player {
         becuase java thought it was, um, the ground. In order to fix that, we checks the overlap and seperated the x-coalition and y-coalition
         ngl its hard
         */
-        
-        
+
+
         //please dont touch this part
-        
+
         if (xOverlap && yOverlap) {
 
             int overlapX = Math.min(playerRight - platformLeft, platformRight - playerLeft);
             int overlapY = Math.min(playerBottom - platformTop, platformBottom - playerTop);
-    
+
             if (overlapX < overlapY) {
                 // X
                 if (playerRight - platformLeft < platformRight - playerLeft) {
-                    x = platformLeft - s; // left 
+                    x = platformLeft - s; // left
                 } else {
-                    x = platformRight; // right 
+                    x = platformRight; // right
                 }
                 veloX = 0;
             } else {
@@ -63,7 +63,7 @@ class Player {
     boolean checkCollision(Platform p) {
         int playerLeft = x, playerRight = x+s, playerTop = y, playerBottom = y+s;
         int platformLeft = p.x, platformRight = p.x+p.l, platformTop = p.y, platformBottom = p.y+p.w;
-    
+
         return (playerLeft < platformRight && playerRight > platformLeft &&
                 playerTop < platformBottom && playerBottom > platformTop);
     }
@@ -71,9 +71,9 @@ class Player {
     boolean resolveCollision(Platform p) {
         int overlapX = Math.min((x+s) - p.x, (p.x+p.l) - x);
         int overlapY = Math.min((y+s) - p.y, (p.y+p.w) - y);
-    
+
         if (overlapX < overlapY) {
-            // Wall 
+            // Wall
             if ((x+s) - p.x < (p.x+p.l) - x) x = p.x - s;
             else x = p.x+p.l;
             veloX = 0;
@@ -81,17 +81,30 @@ class Player {
         } else {
             // ground
             if ((y+s) - p.y < (p.y+p.w) - y) {
-                y = p.y - s; 
+                y = p.y - s;
                 onGround = true;
             } else {
-                y = p.y+p.w; 
+                y = p.y+p.w;
             }
             veloY = 0;
-            return true; 
+            return true;
         }
     }
 
-    
+    boolean touchingEndPlatform(EndPlatform ep){
+        int playerLeft = x;
+        int playerRight = x+s;
+        int playerTop = y;
+        int playerBottom = y+s;
 
+        int platformLeft = ep.x;
+        int platformRight = ep.x+ep.l;
+        int platformTop = ep.y;
+        int platformBottom = ep.y+ep.w;
+
+        boolean xOverlap = (playerLeft < platformRight) && (playerRight > platformLeft);
+        boolean yOverlap = (playerTop < platformBottom) && (playerBottom > platformTop);
+        return xOverlap&&yOverlap;
+    }
 
 }
