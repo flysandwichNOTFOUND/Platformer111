@@ -10,23 +10,28 @@ public class Platformer extends JPanel implements ActionListener, KeyListener {
     private Timer timer;
     private final int gravity = 1;
     private final int moveSpeed = 5;
-    private final int jumpStrength = 17;
+    private final int jumpStrength = 15;
 
     private int level = 1;
     private final int maxLevels = 3; //alter this if needed
-
+    private EndPlatform[] levelEnds = {
+            new EndPlatform(790,400,100,100),
+            new EndPlatform(100,100,100,100)
+    };
 
     //=================================Alter this to move round the terrian===============================
     private Platform[][] allLevels = {
             // Level 1
-            { new Platform(0,500,800,250),
-                    new Platform(100,400,600,250) },
+            {
+                    new Platform(0,500,800,250)},
+                   //new Platform(100,400,600,250) },
 
             // Level 2
             {
-                    new Platform(0,500,800,100),
-                    new Platform(300,350,200,50),
-                    new Platform(600,250,150,50)},
+                    new Platform(0,500,800,250),
+                    new Platform(200,450,100,50),
+                    new Platform(400,350,100,50),
+                    new Platform(600,150,100,50)},
 
             // Level 3
             { new Platform(0,550,800,50),
@@ -36,7 +41,7 @@ public class Platformer extends JPanel implements ActionListener, KeyListener {
     };
     //=========================================================================================================
     private Platform[] platforms = allLevels[0];
-    private Player player = new Player(50,300,50);
+    private Player player = new Player(50,300,25);
 
     public Platformer() {
         timer = new Timer(20, this);
@@ -48,17 +53,31 @@ public class Platformer extends JPanel implements ActionListener, KeyListener {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.setColor(Color.CYAN);
-        g.fillRect(0,0,getWidth(),getHeight());
-
-        g.setColor(Color.GREEN);
+        for (int x = 0; x < 40; x++) {
+            for (int y = 0; y < 30; y++) {
+                g.setColor(Background.colorPixels[1][x][y]); // 假设返回 Color
+                g.fillRect(x*20, y*20, 20, 20);
+            }
+        }
+        //Color brown = new Color(139,69,19);
+        //platforms
+        g.setColor(Color.BLACK);
         for(Platform p : platforms) g.fillRect(p.x,p.y,p.l,p.w);
+        g.setColor(Color.WHITE);
+        for(Platform p : platforms) g.fillRect(p.x+5,p.y+5,p.l-10,p.w-10);
 
-        g.setColor(Color.RED);
+        //player draw
+        g.setColor(Color.BLACK);
         g.fillRect(player.x, player.y, player.s, player.s);
 
+        //display level
         g.setColor(Color.BLACK);
         g.drawString("Level " + level, 20, 20);
+
+        //display end goal
+        g.setColor(Color.YELLOW);
+        EndPlatform ep = levelEnds[level-1];
+        g.fillRect(ep.x,ep.y,ep.l,ep.w);
     }
 
     @Override
@@ -81,23 +100,26 @@ public class Platformer extends JPanel implements ActionListener, KeyListener {
             player.veloY += gravity;
             player.onGround = false;
         }
-
-        if(player.x + player.s >= getWidth()) nextLevel();
+        if(player.y>600){
+            player.x = 50;
+            player.y = 300;
+        }
+        if(player.touchingEndPlatform(levelEnds[level-1])) nextLevel();
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
 
-        if (key == KeyEvent.VK_LEFT) {
+        if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A) {
             player.veloX = -moveSpeed;
         }
 
-        if (key == KeyEvent.VK_RIGHT) {
+        if (key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_D) {
             player.veloX = moveSpeed;
         }
 
-        if (key == KeyEvent.VK_UP && player.onGround) {
+        if ((key == KeyEvent.VK_UP || key == KeyEvent.VK_W)&& player.onGround) {
             player.veloY = -jumpStrength;
             player.onGround = false;
         }
@@ -107,7 +129,7 @@ public class Platformer extends JPanel implements ActionListener, KeyListener {
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
 
-        if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT) {
+        if ((key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A)|| key == KeyEvent.VK_RIGHT) {
             player.veloX = 0;
         }
     }
@@ -237,6 +259,21 @@ class Player {
         }
     }
 
+    boolean touchingEndPlatform(EndPlatform ep){
+        int playerLeft = x;
+        int playerRight = x+s;
+        int playerTop = y;
+        int playerBottom = y+s;
+
+        int platformLeft = ep.x;
+        int platformRight = ep.x+ep.l;
+        int platformTop = ep.y;
+        int platformBottom = ep.y+ep.w;
+
+        boolean xOverlap = (playerLeft < platformRight) && (playerRight > platformLeft);
+        boolean yOverlap = (playerTop < platformBottom) && (playerBottom > platformTop);
+        return xOverlap&&yOverlap;
+    }
 
 }
 
@@ -252,4 +289,16 @@ class Platform{
     boolean isTouching(int playerX, int playerY, int playerSize, Platform pl){
         return false;
     }
+}
+class EndPlatform{
+    int x, y;
+    int l, w;
+
+    EndPlatform(int x, int y, int l, int w){
+        this.x = x;
+        this.y=y;
+        this.l = l;
+        this.w = w;
+    }
+
 }
