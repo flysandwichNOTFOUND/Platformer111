@@ -14,33 +14,54 @@ public class Platformer extends JPanel implements ActionListener, KeyListener {
 
     private int level = 1;
     private final int maxLevels = 3; //alter this if needed
-    private EndPlatform[] levelEnds = {
-            new EndPlatform(790,400,100,100),
-            new EndPlatform(100,100,100,100)
+    private Platform[] levelEnds = {
+        new Platform(790,400,100,100),
+        new Platform(100,100,100,100)
     };
+
 
     //=================================Alter this to move round the terrian===============================
     private Platform[][] allLevels = {
-            // Level 1
-            {
-                    new Platform(0,500,800,250)},
-                   //new Platform(100,400,600,250) },
+        // Level 1 - simple platforms
+        {
+            new Platform(0,500,300,50),
+            new Platform(350,450,200,50),
+            new Platform(600,400,150,50)
+        },
+        // Level 2 - slightly harder
+        {
+            new Platform(0,500,250,50),
+            new Platform(300,450,200,50),
+            new Platform(550,400,150,50),
+            new Platform(700,350,100,50)
+        },
+        // Level 3 - add more jumps
+        {
+            new Platform(0,500,200,50),
+            new Platform(250,450,150,50),
+            new Platform(450,400,150,50),
+            new Platform(650,350,100,50)
+        }
+    };
 
-            // Level 2
-            {
-                    new Platform(0,500,800,250),
-                    new Platform(200,450,100,50),
-                    new Platform(400,350,100,50),
-                    new Platform(600,150,100,50)},
+    private Spike[][] levelSpikes = {
+        // Level 1 spikes
+        { new Spike(200, 480, 20, 20), new Spike(500, 430, 20, 20) },
+        // Level 2 spikes
+        { new Spike(100, 480, 20, 20), new Spike(400, 430, 20, 20), new Spike(600, 380, 20, 20) },
+        // Level 3 spikes
+        { new Spike(150, 480, 20, 20), new Spike(350, 430, 20, 20), new Spike(500, 380, 20, 20) }
+    };
 
-            // Level 3
-            { new Platform(0,550,800,50),
-                    new Platform(150,450,150,50),
-                    new Platform(400,350,150,50),
-                    new Platform(650,250,100,50) }
+    private Platform[] levelEnds = {
+        new Platform(720,400,50,50),  
+        new Platform(700,200,100,50),  
+        new Platform(800,200,50,50)   
     };
     //=========================================================================================================
+    
     private Platform[] platforms = allLevels[0];
+    private Spike[] spikes = levelSpikes[0];
     private Player player = new Player(50,300,25);
 
     public Platformer() {
@@ -55,7 +76,7 @@ public class Platformer extends JPanel implements ActionListener, KeyListener {
         super.paintComponent(g);
         for (int x = 0; x < 40; x++) {
             for (int y = 0; y < 30; y++) {
-                g.setColor(Background.colorPixels[1][x][y]); // 假设返回 Color
+                g.setColor(Background.colorPixels[1][x][y]); // Color
                 g.fillRect(x*20, y*20, 20, 20);
             }
         }
@@ -65,6 +86,11 @@ public class Platformer extends JPanel implements ActionListener, KeyListener {
         for(Platform p : platforms) g.fillRect(p.x,p.y,p.l,p.w);
         g.setColor(Color.WHITE);
         for(Platform p : platforms) g.fillRect(p.x+5,p.y+5,p.l-10,p.w-10);
+        // Spikes
+        g.setColor(Color.RED);
+        for(Spike s : spikes){
+            g.fillRect(s.x, s.y, s.w, s.h);
+        }
 
         //player draw
         g.setColor(Color.BLACK);
@@ -76,9 +102,10 @@ public class Platformer extends JPanel implements ActionListener, KeyListener {
 
         //display end goal
         g.setColor(Color.YELLOW);
-        EndPlatform ep = levelEnds[level-1];
+        Platform ep = levelEnds[level-1];
         g.fillRect(ep.x,ep.y,ep.l,ep.w);
     }
+
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -96,6 +123,20 @@ public class Platformer extends JPanel implements ActionListener, KeyListener {
                 if(player.resolveCollision(p)) yCollision = true;
             }
         }
+
+        for(Spike s : spikes){
+            if(s.spikeTouchesPlayer(player)){
+                // reset player
+                player.x = 50;
+                player.y = 300;
+                player.veloX = 0;
+                player.veloY = 0;
+            }
+
+        }
+
+        checkSpikes();
+
         if(!yCollision){
             player.veloY += gravity;
             player.onGround = false;
@@ -149,47 +190,18 @@ public class Platformer extends JPanel implements ActionListener, KeyListener {
             timer.stop();
         }
     }
-//why dont we do this in the main file?
 
-    public static void main() {
-        JFrame frame = new JFrame("Simple Platformer");
-        //JLabel label = new JLabel("Level 1");
-        //label.setPreferredSize(new Dimension(200, 50));
-        Platformer game = new Platformer();
-        frame.add(game);
-        //frame.add(label);
-        frame.repaint();
-        game.repaint();
-        frame.setSize(800, 600);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-    }
-}
-
-
-
-class Platform{
-    int x, y;
-    int l, w;
-    Platform(int x, int y, int l, int w) {
-        this.x = x;
-        this.y = y;
-        this.l = l;
-        this.w = w;
-    }
-    boolean isTouching(int playerX, int playerY, int playerSize, Platform pl){
-        return false;
-    }
-}
-class EndPlatform{
-    int x, y;
-    int l, w;
-
-    EndPlatform(int x, int y, int l, int w){
-        this.x = x;
-        this.y=y;
-        this.l = l;
-        this.w = w;
+    
+    private void checkSpikes() {
+        for (Spike s : spikes) {
+            if (s.spikeTouchesPlayer(player)) {
+                
+                player.x = 50;
+                player.y = 300;
+                player.veloX = 0;
+                player.veloY = 0;
+            }
+        }
     }
 
 }
