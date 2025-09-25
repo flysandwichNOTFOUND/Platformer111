@@ -3,21 +3,24 @@ import java.awt.*;
 
 public class Main {
     public static void main(String[] args) {
-        Platformer p = new Platformer();
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Demo");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-            // 传入一个简单的 Background 实现（你也可以替换成自己的）
-            NewLabel panel = new NewLabel();
-            panel.setPreferredSize(new Dimension(800, 600));
-
-            frame.add(panel);
-            frame.pack();               // 用 preferredSize
+            frame.setSize(800, 600);
             frame.setLocationRelativeTo(null);
+
+            // Add the background panel
+            NewLabel backgroundPanel = new NewLabel();
+            backgroundPanel.setPreferredSize(new Dimension(800, 600));
+            frame.add(backgroundPanel);
+
+            // Add the game panel (Platformer)
+            Platformer game = new Platformer();
+            frame.add(game);
+
+            frame.pack();
             frame.setVisible(true);
         });
-        p.main();
     }
 }
 class NewLabel extends JPanel {
@@ -29,11 +32,11 @@ class NewLabel extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);  // 清背景 & 双缓冲配合
-        // 逐像素绘制（能跑，但慢）
+        super.paintComponent(g);  // 
+        // 
         for (int x = 0; x < 800; x++) {
             for (int y = 0; y < 600; y++) {
-                g.setColor(background.get(x, y, 1)); // 假设返回 Color
+                g.setColor(background.get(x, y, 1)); // Color
                 g.fillRect(x, y, 1, 1);
             }
         }
